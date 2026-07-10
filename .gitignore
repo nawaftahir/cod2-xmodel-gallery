@@ -1,0 +1,6 @@
+/build/
+/shots/
+*.o
+*.jpg
+*.png
+!docs/**/*.png

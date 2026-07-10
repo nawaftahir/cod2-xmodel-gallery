@@ -4,6 +4,13 @@ A headless XModel viewer and batch gallery generator for **Call of Duty 2** (XMo
 format v20). Point it at a CoD2 install or an extracted asset tree; it reads the
 models straight out of the archives, renders each one offscreen.
 
+## Gallery
+
+Live, searchable, filtered by category and theme:
+**[GitHub Pages](https://nawaftahir.github.io/cod2-xmodel-gallery/)** ·
+**[GitLab Pages](https://nawaftahir.gitlab.io/cod2-xmodel-gallery/)**
+
+Textures live in the sibling [cod2-iwi-gallery](https://nawaftahir.github.io/cod2-iwi-gallery/).
 
 ## What it does
 

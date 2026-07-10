@@ -8,7 +8,7 @@ models straight out of the archives, renders each one offscreen.
 
 Live, searchable, filtered by category and theme:
 **[GitHub Pages](https://nawaftahir.github.io/cod2-xmodel-gallery/)** ·
-**[GitLab Pages](https://nawaftahir.gitlab.io/cod2-xmodel-gallery/)**
+**[GitLab Pages](https://cod2-xmodel-gallery-80b783.gitlab.io/)**
 
 Textures live in the sibling [cod2-iwi-gallery](https://nawaftahir.github.io/cod2-iwi-gallery/).
 

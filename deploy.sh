@@ -24,7 +24,21 @@ git worktree add --quiet --detach "$WT"
   git checkout --quiet --orphan gh-pages
   git rm -rfq . >/dev/null 2>&1 || true
   cp -r "$OUT"/. .
-  touch .nojekyll
+  touch .nojekyll                      # GitHub Pages: serve this branch as-is
+  cat > .gitlab-ci.yml <<'YML'
+# GitLab Pages: publish the prebuilt gallery in this branch to public/.
+pages:
+  stage: deploy
+  image: busybox:latest
+  script:
+    - mkdir -p public
+    - find . -maxdepth 1 -type f ! -name '.gitlab-ci.yml' -exec cp {} public/ \;
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "gh-pages"'
+YML
   git add -A
   git -c user.name="Nawaf Tahir" -c user.email="143700542+nawaftahir@users.noreply.github.com" \
       commit -q -m "Publish model gallery"

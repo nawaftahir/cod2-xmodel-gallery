@@ -12,6 +12,7 @@
 #include "gallery.h"
 #include "categorize.h"
 #include "gl.h"
+#include "glb.h"
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -34,8 +35,8 @@ int main(int argc, char **argv)
 {
     std::vector<std::string> looseRoots;
     std::string basepath, modelName, outdir = "shots";
-    bool batch = false;
-    int W = 640, H = 480, ss = 2, quality = 88, limit = 0;
+    bool batch = false, glb = false;
+    int W = 640, H = 480, ss = 2, quality = 88, limit = 0, texMaxSize = 512;
     std::string imgExt = ".jpg";
 
     for(int i = 1; i < argc; i++) {
@@ -50,6 +51,8 @@ int main(int argc, char **argv)
         else if(a.rfind("--limit=", 0) == 0)    limit = atoi(a.substr(8).c_str());
         else if(a == "--png")                   imgExt = ".png";
         else if(a == "--batch")                 batch = true;
+        else if(a == "--glb")                   glb = true;
+        else if(a.rfind("--texsize=", 0) == 0)  texMaxSize = atoi(a.substr(10).c_str());
         else                                    modelName = a;
     }
     W = std::max(64, W); H = std::max(64, H); ss = std::clamp(ss, 1, 4);
@@ -60,7 +63,7 @@ int main(int argc, char **argv)
             "usage: cod2-xmodel-gallery [sources] <modelname>\n"
             "       cod2-xmodel-gallery [sources] --batch [--outdir=./shots]\n"
             "sources: --basepath=<CoD2 dir> | --loose=<extracted asset dir> (repeatable)\n"
-            "options: --width=N --height=N --ss=1..4 --quality=1..100 --png --limit=N\n");
+            "options: --width=N --height=N --ss=1..4 --quality=1..100 --png --limit=N --glb --texsize=N\n");
         return 1;
     }
 
@@ -139,8 +142,17 @@ int main(int argc, char **argv)
         std::vector<uint8_t> rgb;
         std::string file = safeName(name) + imgExt;
         if(renderer.readRGB(rgb) && write_image(outdir + "/" + file, rgb, W, H, quality)) {
+            std::string glbName;
+            if(glb) {
+                std::string glbDir = outdir + "/models";
+                fs::create_directories(glbDir, ec);
+                glbName = safeName(name) + ".glb";
+                if(!write_glb(glbDir + "/" + glbName, model, vfs, texMaxSize))
+                    glbName.clear();
+            }
             AssetClass ac = classify_model(name);
             gallery.push_back({ name, file, ac.pretty, ac.category, ac.theme,
+                                glbName.empty() ? "" : "models/" + glbName,
                                 (int)model.triangleCount, (int)model.surfaces.size() });
             ok++;
         } else failed++;

@@ -13,10 +13,11 @@ BIN=build/cod2-xmodel-gallery
 
 OUT="$REPO/gallery"
 rm -rf "$OUT"; mkdir -p "$OUT"
-"$BIN" "$@" --batch --outdir="$OUT" --width=480 --height=360 --quality=88
+"$BIN" "$@" --batch --outdir="$OUT" --width=480 --height=360 --quality=88 --glb
 
 # Publish OUT/ onto an orphan gh-pages branch via a throwaway worktree so the main
 # working tree (source) is never touched and .gitignore can't drop the thumbnails.
+git branch -D gh-pages >/dev/null 2>&1 || true
 WT="$(mktemp -d)"
 git worktree add --quiet --detach "$WT"
 (
@@ -32,7 +33,7 @@ pages:
   image: busybox:latest
   script:
     - mkdir -p public
-    - find . -maxdepth 1 -type f ! -name '.gitlab-ci.yml' -exec cp {} public/ \;
+    - for f in * .nojekyll; do if [ "$f" != "public" ] && [ "$f" != ".gitlab-ci.yml" ] && [ "$f" != "*" ]; then mv "$f" public/; fi; done
   artifacts:
     paths:
       - public

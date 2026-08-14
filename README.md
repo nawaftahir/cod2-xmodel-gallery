@@ -6,7 +6,7 @@ models straight out of the archives, renders each one offscreen.
 
 ## Gallery
 
-Live, searchable, filtered by category and theme:
+Live, searchable, filtered by category and theme, with a 3D interactive viewer for each model:
 **[GitHub Pages](https://nawaftahir.github.io/cod2-xmodel-gallery/)** ·
 **[GitLab Pages](https://cod2-xmodel-gallery-80b783.gitlab.io/)**
 
@@ -22,6 +22,7 @@ Textures live in the sibling [cod2-iwi-gallery](https://nawaftahir.github.io/cod
 - **Resolves materials → textures**: parses CoD2 `materials/` binaries for the
   `colorMap`, then decodes the referenced **IWI v5** texture (DXT1/3/5).
 - **Renders offscreen** to a supersampled framebuffer and writes JPEG (or PNG).
+- **Exports to GLB**: optionally exports models with embedded textures as self-contained 3D GLB files for interactive viewing.
 - **Classifies every model** into a type category (Weapons, Vehicles, Structures,
   Foliage, ...) plus a map/theme tag (Egypt, Caen, Stalingrad, ...), so the gallery
   filters by both. Raw asset ids are preserved for use in Radiant/GSC.
@@ -78,6 +79,8 @@ The full stock set is ~1,533 models; the tool renders all of them in ~57s (~12 M
 | `--quality=1..100` | JPEG quality (default 88) |
 | `--png` | write PNG instead of JPEG |
 | `--limit=N` | batch: only the first N models (for quick tests) |
+| `--glb` | write self-contained GLB model |
+| `--texsize=N` | GLB texture max size (default 512) |
 
 ## Layout
 
@@ -88,6 +91,7 @@ src/image.*      DXT1/3/5, IWI v5, DDS, TGA -> RGBA8
 src/xmodel.*     XModel v20: descriptor + skeleton + surfaces
 src/material.*   CoD2 material -> colorMap texture name
 src/categorize.* type + theme classification, display names
+src/glb.*        GLB binary exporter
 src/renderer.*   offscreen FBO renderer + texture pipeline
 src/gallery.*    JPEG/PNG output + categorized, searchable index.html
 third_party/     miniz (zip), stb_image_write (image output)

@@ -10,6 +10,7 @@ struct GalleryItem {
     std::string pretty;   // human-readable title
     std::string category; // type category (Weapons, Vehicles, ...)
     std::string theme;    // map/theme tag, may be empty
+    std::string glbFile;  // GLB filename relative to gallery dir, empty if no GLB
     int triangles = 0;
     int surfaces = 0;
 };

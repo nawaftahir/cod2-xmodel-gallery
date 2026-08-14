@@ -94,6 +94,19 @@ h1 b{color:var(--accent)}
 .foot{margin-top:30px;padding-top:16px;border-top:1px solid var(--edge);color:var(--muted);
   font:12px/1.6 ui-monospace,monospace}
 .foot b{color:var(--fg)}
+.btn3d{margin-top:10px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.02em;text-transform:uppercase;padding:5px 9px;border-radius:5px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center}
+.btn3d:hover{background:var(--accent);color:var(--bg)}
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.modal-bg:not(.hidden){opacity:1;pointer-events:auto}
+.modal-panel{background:var(--panel);border:1px solid var(--edge);border-radius:12px;width:90vw;height:85vh;max-width:1200px;display:flex;flex-direction:column;overflow:hidden;transform:scale(0.95);transition:transform .2s}
+.modal-bg:not(.hidden) .modal-panel{transform:scale(1)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--edge)}
+.modal-title{font:600 15px/1.3 ui-sans-serif,system-ui,sans-serif;color:var(--fg)}
+.modal-close{background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px}
+.modal-close:hover{color:var(--fg)}
+model-viewer{flex:1;width:100%;min-height:500px;background:var(--bg);--poster-color:transparent}
+.modal-info{padding:10px 16px;border-top:1px solid var(--edge);font:12px/1.4 ui-monospace,monospace;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.modal-info b{color:var(--fg)}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
 )CSS";
 
@@ -133,7 +146,7 @@ void write_gallery(const std::string &outdir, const std::vector<GalleryItem> &it
           << ";border-color:color-mix(in oklab," << c.second << " 45%,transparent)}"
           << ".filter[data-f=\"" << c.first << "\"].on{background:" << c.second
           << ";border-color:" << c.second << "}";
-    f << "</style></head><body>";
+    f << "</style><script type=\"module\" src=\"https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js\"></script></head><body>";
 
     f << "<header><div class=\"head-in\">"
       << "<p class=\"eyebrow\">Call of Duty 2 &middot; Stock Asset Library</p>"
@@ -173,9 +186,20 @@ void write_gallery(const std::string &outdir, const std::vector<GalleryItem> &it
           << "<div class=\"slug\">" << esc(it.model) << "</div><div class=\"chips\">"
           << "<span class=\"chip\" data-c=\"" << esc(it.category) << "\">" << esc(it.category) << "</span>";
         if(!it.theme.empty()) f << "<span class=\"chip theme\">" << esc(it.theme) << "</span>";
-        f << "</div></div></article>";
+        f << "</div>";
+        if(!it.glbFile.empty()) {
+            f << "<button class=\"btn3d\" onclick=\"open3d('" << esc(it.glbFile) << "','" << esc(it.pretty) << "','" << esc(it.file) << "','" << esc(it.category) << "','" << esc(it.theme) << "'," << it.triangles << ")\">⬡ View 3D</button>";
+        }
+        f << "</div></article>";
     }
     f << "</main><p class=\"empty hidden\" id=\"empty\">No models match.</p>"
+      << "<div id=\"modal\" class=\"modal-bg hidden\" onclick=\"close3d()\">"
+      << "<div class=\"modal-panel\" onclick=\"event.stopPropagation()\">"
+      << "<div class=\"modal-header\"><div class=\"modal-title\" id=\"m-name\"></div>"
+      << "<button class=\"modal-close\" onclick=\"close3d()\">✕</button></div>"
+      << "<model-viewer id=\"mv\" camera-controls auto-rotate auto-rotate-delay=\"500\" shadow-intensity=\"0.7\" exposure=\"1.2\" loading=\"eager\"></model-viewer>"
+      << "<div class=\"modal-info\" id=\"m-info\"></div>"
+      << "</div></div>"
       << "<p class=\"foot\">Rendered headless via EGL/Mesa &middot; classified into " << cats.size()
       << " categories &middot; raw asset ids preserved for use in Radiant/GSC.</p></div>";
 
@@ -193,6 +217,15 @@ void write_gallery(const std::string &outdir, const std::vector<GalleryItem> &it
       "cat=b.dataset.f;catf.querySelectorAll('.filter').forEach(x=>x.classList.toggle('on',x===b));apply();});"
       "const tf=document.getElementById('themef');if(tf)tf.addEventListener('click',e=>{const b=e.target.closest('.filter');if(!b)return;"
       "theme=b.dataset.t;tf.querySelectorAll('.filter').forEach(x=>x.classList.toggle('on',x===b));apply();});"
-      "apply();</script></body></html>\n";
+      "apply();"
+      "function open3d(src, name, poster, cat, theme, tris) {"
+      "const m=document.getElementById('modal'),mv=document.getElementById('mv');"
+      "document.getElementById('m-name').textContent=name;"
+      "let info='<b>'+cat+'</b>';if(theme)info+=' &middot; '+theme;info+=' &middot; <b>'+tris+'</b> tris';"
+      "document.getElementById('m-info').innerHTML=info;"
+      "mv.poster=poster;mv.src=src;m.classList.remove('hidden');}"
+      "function close3d() {document.getElementById('modal').classList.add('hidden');document.getElementById('mv').src='';}"
+      "document.addEventListener('keydown',e=>{if(e.key==='Escape')close3d();});"
+      "</script></body></html>\n";
     printf("Gallery: %s/index.html (%zu models, %zu categories)\n", outdir.c_str(), items.size(), cats.size());
 }

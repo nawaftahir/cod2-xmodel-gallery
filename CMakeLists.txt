@@ -16,6 +16,7 @@ add_executable(cod2-xmodel-gallery
     src/material.cpp
     src/renderer.cpp
     src/gallery.cpp
+    src/glb.cpp
     src/categorize.cpp
     third_party/miniz.c
 )
@@ -24,4 +25,4 @@ add_executable(cod2-xmodel-gallery
 # runtime shared objects by exact soname (works without libEGL.so/libGL.so devel
 # symlinks) and vendor the few headers we need. If you have the -dev packages and
 # prefer find_package(OpenGL)/EGL, swapping these two lines also works.
-target_link_options(cod2-xmodel-gallery PRIVATE -l:libEGL.so.1 -l:libGL.so.1)
+target_link_libraries(cod2-xmodel-gallery PRIVATE -l:libEGL.so.1 -l:libGL.so.1)

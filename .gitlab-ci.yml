@@ -1,0 +1,12 @@
+# GitLab Pages: publish the prebuilt gallery in this branch to public/.
+pages:
+  stage: deploy
+  image: busybox:latest
+  script:
+    - mkdir -p public
+    - for f in * .nojekyll; do if [ "$f" != "public" ] && [ "$f" != ".gitlab-ci.yml" ] && [ "$f" != "*" ]; then mv "$f" public/; fi; done
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "gh-pages"'
